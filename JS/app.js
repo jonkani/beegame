@@ -61,7 +61,7 @@ gameState.prototype = {
       this.beeSprite2.anchor.set(0.5, 0.5);
 
       // create stingers
-      this.beeSprite1.addChild(game.make.sprite(0, 50, assets.stinger1.name));
+      this.beeSprite1.addChild(game.make.sprite(100, 100, assets.stinger1.name));
       this.beeSprite2.addChild(game.make.sprite(0, 50, assets.stinger2.name));
 
       // turn on physics for sprites
@@ -76,6 +76,9 @@ gameState.prototype = {
       var bee1Material = game.physics.p2.createMaterial('bee1Material', this.beeSprite1.body);
       var bee2Material = game.physics.p2.createMaterial('bee2Material', this.beeSprite2.body);
       var worldMaterial = game.physics.p2.createMaterial('worldMaterial');
+
+      this.bee1StingerGroup = this.game.physics.p2.createCollisionGroup();
+
 
       // game materials + material-specific collisions
       game.physics.p2.setWorldMaterial(worldMaterial, true, true, true, true);
