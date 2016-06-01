@@ -12,7 +12,9 @@ var assets = {
   bee2: {URL: 'Sprites/Bee2.png', name: 'bee2'},
 
   stinger1: {URL: 'Sprites/hsting.png', name: 'stinger1'},
-  stinger2: {URL: 'Sprites/hsting.png', name: 'stinger2'}
+  stinger2: {URL: 'Sprites/hsting.png', name: 'stinger2'},
+
+  stingBlank: {name: 'stingBlank'}
 }
 
 var beeProperties = {
@@ -61,7 +63,7 @@ gameState.prototype = {
       this.beeSprite2.anchor.set(0.5, 0.5);
 
       // create stingers
-      this.beeSprite1.addChild(game.make.sprite(100, 100, assets.stinger1.name));
+      this.beeSprite1.addChild(game.make.sprite(0, 50, assets.stinger1.name));
       this.beeSprite2.addChild(game.make.sprite(0, 50, assets.stinger2.name));
 
       // turn on physics for sprites
@@ -72,12 +74,23 @@ gameState.prototype = {
       this.beeSprite1.children[0].body.kinematic = true;
       this.beeSprite2.children[0].body.kinematic = true;
 
+
+      this.stingPositioner = game.add.sprite(0, 50);
+      this.stingPositioner.anchor.set(0.5, 0.5);
+      this.stingPositioner.pivot.set(0, 0);
+      this.beeSprite1.addChild(this.stingPositioner);
+
+
+
       // create game materials
       var bee1Material = game.physics.p2.createMaterial('bee1Material', this.beeSprite1.body);
       var bee2Material = game.physics.p2.createMaterial('bee2Material', this.beeSprite2.body);
       var worldMaterial = game.physics.p2.createMaterial('worldMaterial');
 
       this.bee1StingerGroup = this.game.physics.p2.createCollisionGroup();
+      this.bee2StingerGroup = this.game.physics.p2.createCollisionGroup();
+      this.beeSprite1.body.setCollisionGroup(this.bee1StingerGroup);
+      this.beeSprite1.children[0].body.setCollisionGroup(this.bee1StingerGroup);
 
 
       // game materials + material-specific collisions
@@ -90,8 +103,8 @@ gameState.prototype = {
       beeContactMaterial.restitution = 1.5;
 
       // stinger collision
-      this.beeSprite1.body.createBodyCallback(this.beeSprite2.children[0].body, this.player1Stung, this);
-      this.beeSprite2.children[0].body.createBodyCallback(this.beeSprite1, this.player1Stung, this);
+      // this.beeSprite1.body.createBodyCallback(this.beeSprite2.children[0].body, this.player1Stung, this);
+      // this.beeSprite2.children[0].body.createBodyCallback(this.beeSprite1, this.player1Stung, this);
 
       this.initKeyboard();
       game.stage.backgroundColor = '#000fff';
@@ -101,6 +114,9 @@ gameState.prototype = {
 
     update: function () {
       this.checkPlayerInput();
+      this.beeSprite1.children[0].body.reset(this.stingPositioner.world.x, this.stingPositioner.world.y);
+      this.beeSprite1.children[0].world.x = this.beeSprite1.children[0].body.x;
+      this.beeSprite1.children[0].world.y = this.beeSprite1.children[0].body.y;
       // game.physics.arcade.collide(this.beeSprite1, this.beeSprite2);
       // game.physics.arcade.overlap(this.beeSprite1, this.beeSprite2.children[0], this.player1Stung, null, this);
       // game.physics.arcade.overlap(this.beeSprite2, this.beeSprite1.children[0], this.player2Stung, null, this);
@@ -160,6 +176,13 @@ gameState.prototype = {
 
     player2Stung: function(bee, stinger) {
       console.log('2stung')
+    },
+
+    playerStung: function() {
+      var boundsA = this.beeSprite1.getBounds();
+      var boundsB = this.beeSprite2.children[0].getBounds();
+
+      return Phaser.Rectangle.intersects(boundsA, boundsB);
     },
 
     checkPlayerInput: function() {
