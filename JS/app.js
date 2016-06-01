@@ -1,6 +1,6 @@
 var gameProperties = {
-    screenWidth: 800,
-    screenHeight: 600,
+    screenWidth: 1000,
+    screenHeight: 650,
 };
 
 var states = {
@@ -9,10 +9,10 @@ var states = {
 
 var assets = {
   bee1: {URL: 'Sprites/Bee1.png', name: 'bee1'},
-  bee2: {URL: 'Sprites/Bee2.png', name: 'bee2'},
+  bee2: {URL: 'Sprites/Bee22.png', name: 'bee2'},
 
-  stinger1: {URL: 'Sprites/hsting.png', name: 'stinger1'},
-  stinger2: {URL: 'Sprites/hsting.png', name: 'stinger2'},
+  stinger1: {URL: 'Sprites/Stinger1.png', name: 'Stinger1'},
+  stinger2: {URL: 'Sprites/Stinger2.png', name: 'Stinger2'},
 
   stingBlank: {name: 'stingBlank'}
 }
@@ -47,12 +47,14 @@ gameState.prototype = {
       game.load.image(assets.bee2.name, assets.bee2.URL);
       game.load.image(assets.stinger1.name, assets.stinger1.URL);
       game.load.image(assets.stinger2.name, assets.stinger2.URL);
+      this.game.load.physics("stinger_physics", "assets/stinger2.json");
     },
 
     create: function () {
-      game.world.setBounds(0, 0, 800, 600);
+      game.world.setBounds(0, 0, 1000, 650);
       game.physics.startSystem(Phaser.Physics.P2JS);
       game.physics.p2.setImpactEvents(true);
+      game.physics.p2.restitution = 0.8;
 
       // create bee 1
       this.beeSprite1 = game.add.sprite(beeProperties.startX, beeProperties.startY, assets.bee1.name);
@@ -63,101 +65,114 @@ gameState.prototype = {
       this.beeSprite2.anchor.set(0.5, 0.5);
 
       // create stingers
-      this.beeSprite1.addChild(game.make.sprite(0, 50, assets.stinger1.name));
-      this.beeSprite2.addChild(game.make.sprite(0, 50, assets.stinger2.name));
+      this.stinger1 = game.add.sprite(0, 0, assets.stinger1.name);
+      this.stinger2 = game.add.sprite(0, 0, assets.stinger2.name);
 
       // turn on physics for sprites
-      this.game.physics.p2.enable(this.beeSprite1, true, true);
+      this.game.physics.p2.enable(this.beeSprite1);
       this.beeSprite1.body.angle = 0;
-      this.game.physics.p2.enable(this.beeSprite2, true, true);
+      this.game.physics.p2.enable(this.beeSprite2);
       this.beeSprite2.body.angle = 180;
-      this.beeSprite1.children[0].body.kinematic = true;
-      this.beeSprite2.children[0].body.kinematic = true;
+      this.game.physics.p2.enable(this.stinger1);
+      this.game.physics.p2.enable(this.stinger2);
+      this.stinger1.body.kinematic = true;
+      this.stinger2.body.kinematic = true;
 
 
-      this.stingPositioner = game.add.sprite(0, 50);
-      this.stingPositioner.anchor.set(0.5, 0.5);
-      this.stingPositioner.pivot.set(0, 0);
-      this.beeSprite1.addChild(this.stingPositioner);
+      this.stingPositioner1 = game.add.sprite(0, 70);
+      this.stingPositioner1.anchor.set(0.5, 0.5);
+      this.stingPositioner1.pivot.set(0, 0);
+      this.beeSprite1.addChild(this.stingPositioner1);
+
+      this.stingPositioner2 = game.add.sprite(0, 70);
+      this.stingPositioner2.anchor.set(0.5, 0.5);
+      this.stingPositioner2.pivot.set(0, 0);
+      this.beeSprite2.addChild(this.stingPositioner2);
 
 
 
-      // create game materials
-      var bee1Material = game.physics.p2.createMaterial('bee1Material', this.beeSprite1.body);
-      var bee2Material = game.physics.p2.createMaterial('bee2Material', this.beeSprite2.body);
-      var worldMaterial = game.physics.p2.createMaterial('worldMaterial');
+      // create walls
+      var hBlockShape = this.game.add.bitmapData(this.game.world.width, 10);
+      var vBlockShape = this.game.add.bitmapData(10, this.game.world.height);
 
+      // fill block shapes
+      hBlockShape.ctx.rect(0, 0, this.game.world.width, 10);
+      hBlockShape.ctx.fillStyle = '000';
+      hBlockShape.ctx.fill();
+
+      vBlockShape.ctx.rect(0, 0, 10, this.game.world.height);
+      vBlockShape.ctx.fillStyle = '000';
+      vBlockShape.ctx.fill();
+
+      // create top wall
+      this.blockT = this.game.add.sprite(this.game.world.width/2, 5, hBlockShape);
+      this.game.physics.p2.enable(this.blockT);
+      this.blockT.body.static = true;
+      this.blockT.anchor.setTo(0.5, 0.5);
+
+      // create bottom wall
+      this.blockB = this.game.add.sprite(this.game.world.width/2, this.game.world.height - 5, hBlockShape)
+      this.game.physics.p2.enable(this.blockB);
+      this.blockB.body.static = true;
+      this.blockB.anchor.setTo(0.5, 0.5);
+
+      // create left wall
+      this.blockL = this.game.add.sprite(5, this.game.world.height/2, vBlockShape)
+      this.game.physics.p2.enable(this.blockL);
+      this.blockL.body.static = true;
+      this.blockL.anchor.setTo(0.5, 0.5);
+
+      // create right wall
+      this.blockR = this.game.add.sprite(this.game.world.width - 5, this.game.world.height/2, vBlockShape)
+      this.game.physics.p2.enable(this.blockR);
+      this.blockR.body.static = true;
+      this.blockR.anchor.setTo(0.5, 0.5);
+
+      // set collision groups
+      // create collision groups
+      this.bee1BodyGroup = this.game.physics.p2.createCollisionGroup();
+      this.bee2BodyGroup = this.game.physics.p2.createCollisionGroup();
       this.bee1StingerGroup = this.game.physics.p2.createCollisionGroup();
       this.bee2StingerGroup = this.game.physics.p2.createCollisionGroup();
-      this.beeSprite1.body.setCollisionGroup(this.bee1StingerGroup);
-      this.beeSprite1.children[0].body.setCollisionGroup(this.bee1StingerGroup);
+      this.terrainGroup = this.game.physics.p2.createCollisionGroup();
+      // assign block collsion groups
+      this.blockT.body.setCollisionGroup(this.terrainGroup);
+      this.blockB.body.setCollisionGroup(this.terrainGroup);
+      this.blockL.body.setCollisionGroup(this.terrainGroup);
+      this.blockR.body.setCollisionGroup(this.terrainGroup);
+      // assign bee collision groups
+      this.beeSprite1.body.setCollisionGroup(this.bee1BodyGroup);
+      this.stinger1.body.setCollisionGroup(this.bee1StingerGroup);
+      this.beeSprite2.body.setCollisionGroup(this.bee2BodyGroup);
+      this.stinger2.body.setCollisionGroup(this.bee2StingerGroup);
+      // assign physiscs collisions
+      this.blockT.body.collides([this.bee1BodyGroup, this.bee2BodyGroup]);
+      this.blockB.body.collides([this.bee1BodyGroup, this.bee2BodyGroup]);
+      this.blockL.body.collides([this.bee1BodyGroup, this.bee2BodyGroup]);
+      this.blockR.body.collides([this.bee1BodyGroup, this.bee2BodyGroup]);
+      this.beeSprite1.body.collides([this.bee2BodyGroup, this.terrainGroup]);
+      this.beeSprite2.body.collides([this.bee1BodyGroup, this.terrainGroup]);
 
-
-      // game materials + material-specific collisions
-      game.physics.p2.setWorldMaterial(worldMaterial, true, true, true, true);
-      var beeContactMaterial = game.physics.p2.createContactMaterial(bee1Material, bee2Material);
-      var bee1WorldContactMaterial = game.physics.p2.createContactMaterial(bee1Material, worldMaterial);
-      var bee2WorldContactMaterial = game.physics.p2.createContactMaterial(bee2Material, worldMaterial);
-      bee1WorldContactMaterial.restitution = 0.9;
-      bee2WorldContactMaterial.restitution = 0.9;
-      beeContactMaterial.restitution = 1.5;
 
       // stinger collision
       // this.beeSprite1.body.createBodyCallback(this.beeSprite2.children[0].body, this.player1Stung, this);
       // this.beeSprite2.children[0].body.createBodyCallback(this.beeSprite1, this.player1Stung, this);
 
       this.initKeyboard();
-      game.stage.backgroundColor = '#000fff';
-
+      game.stage.backgroundColor = '#ffff00';
     },
 
 
     update: function () {
       this.checkPlayerInput();
-      this.beeSprite1.children[0].body.reset(this.stingPositioner.world.x, this.stingPositioner.world.y);
-      this.beeSprite1.children[0].world.x = this.beeSprite1.children[0].body.x;
-      this.beeSprite1.children[0].world.y = this.beeSprite1.children[0].body.y;
-      // game.physics.arcade.collide(this.beeSprite1, this.beeSprite2);
-      // game.physics.arcade.overlap(this.beeSprite1, this.beeSprite2.children[0], this.player1Stung, null, this);
-      // game.physics.arcade.overlap(this.beeSprite2, this.beeSprite1.children[0], this.player2Stung, null, this);
+      // keep stingers attached to bee bodies
+      this.stinger1.body.reset(this.stingPositioner1.world.x, this.stingPositioner1.world.y);
+      this.stinger1.body.rotation = this.beeSprite1.rotation;
+
+      this.stinger2.body.reset(this.stingPositioner2.world.x, this.stingPositioner2.world.y);
+      this.stinger2.body.rotation = this.beeSprite2.rotation;
     },
 
-    // initGraphics: function() {
-    //   this.beeSprite1 = game.add.sprite(beeProperties.startX, beeProperties.startY, assets.bee1.name);
-    //   this.beeSprite1.anchor.set(0.5, 0.5);
-    //   // this.beeSprite1.addChild(game.add.sprite(-80, -10, assets.stinger1.name));
-    //
-    //   this.beeSprite2 = game.add.sprite(gameProperties.screenWidth * 0.75, gameProperties.screenHeight * 0.5, assets.bee2.name);
-    //   this.beeSprite2.anchor.set(0.5, 0.5);
-    //   // this.beeSprite2.addChild(game.add.sprite(-80, -10, assets.stinger2.name));
-    // },
-
-    // render: function () {
-    //   game.debug.body(this.beeSprite1);
-    //   game.debug.body(this.beeSprite2);
-    // //   game.debug.body(this.beeSprite1.children[0]);
-    // //   game.debug.body(this.beeSprite2.children[0]);
-    // },
-
-    // initPhysics: function() {
-    //   game.physics.startSystem(Phaser.Physics.P2JS);
-    //   // game.physics.p2.setImpactEvents(true);
-    //   game.physics.p2.restitution = 0.8;
-    //
-    //   game.physics.enable(this.beeSprite1, Phaser.Physics.P2JS);
-    //   this.beeSprite1.body.angle = 0;
-    //   // this.beeSprite1.body.inertia(beeProperties.drag);
-    //   // this.beeSprite1.body.maxVelocity.set(beeProperties.maxVelocity);
-    //   // this.beeSprite1.body.bounce.set(0.9, 0.9);
-    //   this.beeSprite1.body.collideWorldBounds = true;
-    //
-    //   game.physics.enable(this.beeSprite2, Phaser.Physics.P2JS);
-    //   this.beeSprite2.body.angle = 90;
-    //   // this.beeSprite2.body.inertia(beeProperties.drag);
-    //   // this.beeSprite2.body.maxVelocity.set(beeProperties.maxVelocity);
-    //   // this.beeSprite2.body.bounce.set(0.9, 0.9);
-    //   this.beeSprite2.body.collideWorldBounds = true;
-    // },
 
     initKeyboard: function() {
       this.key_left1 = game.input.keyboard.addKey(Phaser.Keyboard.A);
@@ -178,12 +193,6 @@ gameState.prototype = {
       console.log('2stung')
     },
 
-    playerStung: function() {
-      var boundsA = this.beeSprite1.getBounds();
-      var boundsB = this.beeSprite2.children[0].getBounds();
-
-      return Phaser.Rectangle.intersects(boundsA, boundsB);
-    },
 
     checkPlayerInput: function() {
       if (this.key_left1.isDown) {

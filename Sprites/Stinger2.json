@@ -1,0 +1,20 @@
+{ 
+    
+    "Stinger2": [
+        
+        {
+            "density": 2, "friction": 0, "bounce": 0, 
+            "filter": { "categoryBits": 1, "maskBits": 65535 },
+            "shape": [   61, 29  ,  41, 48  ,  27, 48  ,  7, 29  ,  0, 0  ,  68, 0  ]
+        }
+    ]
+    , 
+    "Stinger1": [
+        
+        {
+            "density": 2, "friction": 0, "bounce": 0, 
+            "filter": { "categoryBits": 1, "maskBits": 65535 },
+            "shape": [   61, 29  ,  41, 48  ,  27, 48  ,  7, 29  ,  0, 0  ,  68, 0  ]
+        }
+    ]
+}
