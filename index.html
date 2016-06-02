@@ -3,11 +3,43 @@
   <head>
     <meta charset="utf-8">
     <title>Beelieve</title>
+    <!--Import Google Icon Font-->
+    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+    <link type="text/css" rel="stylesheet" href="css/style.css">
+
+
   </head>
   <body>
+    <h1>Bee Game</h1>
+    <p>a game about bees</p>
     <div id="gameDiv">
-      <script src="JS/phaser/build/phaser.js"></script>
-      <script src="JS/app.js"></script>
+    <div id="helpModal" class="modal">
+      <div class="modal-content">
+        <h3 class="helpTitle">Bee Aware:</h3>
+        <p class="instructions">you are now entering the dangerous world of BEES. these tips might bee helpful:
+          <ol class="instructionList">
+            <li>
+              <ul>
+                <li>stingers are dangerous! don't get stung.</li>
+                <li>if you do get stung, don't scratch at it.</li>
+              </ul>
+            </li>
+            <li>an elephant can live through 60,000 stings, but you will die in two.</li>
+            <li>click the twirling bee to start.</li>
+          </ol>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="beeButton modal-action modal-close waves-effect waves-yellow btn-flat">buzz</a>
+      </div>
     </div>
+    </div>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="js/materialize.min.js"></script>
+    <script src="JS/phaser.min.js"></script>
+    <script src="JS/menu.js"></script>
+    <script src="JS/app.js"></script>
   </body>
 </html>
