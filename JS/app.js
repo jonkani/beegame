@@ -448,7 +448,8 @@ gameState.prototype = {
     },
 
     gameReset: function() {
-      game.state.start(states.menu)
+      this.flight.stop();
+      game.state.start(states.menu);
     },
 
     checkPlayerInput: function() {
