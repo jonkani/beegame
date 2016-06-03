@@ -74,6 +74,7 @@ gameState.prototype = {
       this.beep = this.game.add.audio('beep');
       this.win = this.game.add.audio('win');
 
+      // create health indicators
       this.heartSprite1 = game.add.sprite(10, 45, assets.heart1.name);
       this.heartSprite12 = game.add.sprite(10, 10, assets.heart1.name);
       this.heartSprite2 = game.add.sprite(848, 10, assets.heart2.name);
@@ -421,6 +422,7 @@ gameState.prototype = {
           game.physics.p2.pause();
           this.fight.setText('red bee is best bee');
           this.win.play();
+          this.flight.fadeOut(4000);
           game.time.events.add(Phaser.Timer.SECOND * 5, this.gameReset, this);
         };
       };
@@ -439,6 +441,7 @@ gameState.prototype = {
           game.physics.p2.pause();
           this.fight.setText('blue bee is best bee');
           this.win.play();
+          this.flight.fadeOut(4000);
           game.time.events.add(Phaser.Timer.SECOND * 5, this.gameReset, this);
         };
       }
