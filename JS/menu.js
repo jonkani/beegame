@@ -3,6 +3,7 @@ var Menu = {
     preload : function() {
         game.load.image('menuBee', './sprites/bee.png');
         game.load.image('questionMark', './sprites/questionmark.png');
+        game.load.audio('flight', 'sprites/flight.mp3');
     },
 
     create: function () {
@@ -65,19 +66,15 @@ var Menu = {
       }
         bee1Name = data[0].word;
         bee2Name = data[1].word;
-        var $xhr2 = $.getJSON('    http://api.wordnik.com:80/v4/words.json/randomWords?hasDictionaryDef=false&includePartOfSpeech=adjective&minCorpusCount=0&maxCorpusCount=-1&minDictionaryCount=1&maxDictionaryCount=-1&minLength=3&maxLength=10&limit=2&api_key=78c54330c7deecd16a3010c08a3090514ad52320e617e2a93');
-        $xhr2.fail(function(a, b, c) {
-          console.log(arguments);
-        });
+        var $xhr2 = $.getJSON('http://api.wordnik.com:80/v4/words.json/randomWords?hasDictionaryDef=false&includePartOfSpeech=adjective&minCorpusCount=0&maxCorpusCount=-1&minDictionaryCount=1&maxDictionaryCount=-1&minLength=3&maxLength=10&limit=2&api_key=78c54330c7deecd16a3010c08a3090514ad52320e617e2a93');
         $xhr2.done(function(data) {
           if ($xhr2.status !== 200) {
             return;
           }
           bee1Adj = data[0].word.charAt(0).toUpperCase() + data[0].word.slice(1);
           bee2Adj = data[1].word.charAt(0).toUpperCase() + data[1].word.slice(1);
+          game.state.start(states.game);
         });
-        console.log(bee1Name+bee1Adj, bee2Adj+bee2Adj);
-        game.state.start(states.game);
       });
     }
 

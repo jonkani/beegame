@@ -19,7 +19,7 @@ var assets = {
 }
 
 var beeProperties = {
-  startX: gameProperties.screenWidth * 0.25,
+  startX: gameProperties.screenWidth * 0.20,
   startY: gameProperties.screenHeight * 0.5,
   acceleration: 500,
   drag: 25,
@@ -59,13 +59,16 @@ gameState.prototype = {
       game.physics.startSystem(Phaser.Physics.P2JS);
       game.physics.p2.setImpactEvents(true);
       game.physics.p2.restitution = 0.8;
+      game.physics.p2.pause();
+
+      this.flight = this.game.add.audio('flight');
 
       // create bee 1
       this.beeSprite1 = game.add.sprite(beeProperties.startX, beeProperties.startY, assets.bee1.name);
       this.beeSprite1.anchor.set(0.5, 0.5);
 
       // create bee 2
-      this.beeSprite2 = game.add.sprite(gameProperties.screenWidth * 0.75, gameProperties.screenHeight * 0.5, assets.bee2.name);
+      this.beeSprite2 = game.add.sprite(gameProperties.screenWidth * 0.80, gameProperties.screenHeight * 0.5, assets.bee2.name);
       this.beeSprite2.anchor.set(0.5, 0.5);
 
       // create stingers
@@ -99,6 +102,69 @@ gameState.prototype = {
       this.stingPositioner2.pivot.set(0, 0);
       this.beeSprite2.addChild(this.stingPositioner2);
 
+      // create versus message placement
+      // bee1 name
+      this.name1 = game.add.text(beeProperties.startX + 120, beeProperties.startY - 20, "", {
+        font: "20px silkscreennormal",
+        fill: "#000000",
+        align: "center"
+      });
+      this.name1.anchor.setTo(0.5,0.5);
+
+      // the
+      this.the1 = game.add.text(beeProperties.startX + 120, beeProperties.startY, "", {
+      font: "20px silkscreennormal",
+      fill: "#000000",
+      align: "center"
+      });
+      this.the1.anchor.setTo(0.5,0.5);
+
+      // bee1 adjective
+      this.adj1 = game.add.text(beeProperties.startX + 120, beeProperties.startY + 20, "", {
+      font: "20px silkscreennormal",
+      fill: "#000000",
+      align: "center"
+      });
+      this.adj1.anchor.setTo(0.5,0.5);
+
+      // vs
+      this.versus = game.add.text(gameProperties.screenWidth/2, gameProperties.screenHeight * 0.5, '', {
+      font: "35px silkscreennormal",
+      fill: "#000000",
+      align: "center"
+      });
+      this.versus.anchor.setTo(0.5,0.5);
+
+      // bee2 name
+      this.name2 = game.add.text(gameProperties.screenWidth * 0.80 - 120, gameProperties.screenHeight * 0.5 - 20, "", {
+      font: "20px silkscreennormal",
+      fill: "#000000",
+      align: "center"
+      });
+      this.name2.anchor.setTo(0.5,0.5);
+
+      // the
+      this.the2 = game.add.text(gameProperties.screenWidth * 0.80 - 120, gameProperties.screenHeight * 0.5, "", {
+      font: "20px silkscreennormal",
+      fill: "#000000",
+      align: "center"
+      });
+      this.the2.anchor.setTo(0.5,0.5);
+
+      // bee2 adjective
+      this.adj2 = game.add.text(gameProperties.screenWidth * 0.80 - 120, gameProperties.screenHeight * 0.5 + 20, "", {
+      font: "20px silkscreennormal",
+      fill: "#000000",
+      align: "center"
+      });
+      this.adj2.anchor.setTo(0.5,0.5);
+
+      this.fight = game.add.text(gameProperties.screenWidth/2, gameProperties.screenHeight/3, "", {
+      font: "60px silkscreennormal",
+      fill: "#000000",
+      align: "center"
+      });
+      this.fight.anchor.setTo(0.5,0.5);
 
 
       // create walls
@@ -176,7 +242,9 @@ gameState.prototype = {
       this.stinger1.body.createBodyCallback(this.stinger2, this.stingerRepulse, this);
       this.stinger2.body.createBodyCallback(this.stinger1, this.stingerRepulse, this);
 
+
       this.initKeyboard();
+      this.setUp();
       game.stage.backgroundColor = '#ffff00';
     },
 
@@ -189,6 +257,43 @@ gameState.prototype = {
 
       this.stinger2.body.reset(this.stingPositioner2.world.x, this.stingPositioner2.world.y);
       this.stinger2.body.rotation = this.beeSprite2.rotation;
+    },
+
+    render: function () {
+      if (timer.running) {
+        // bee1 name
+        if (timer.ms > 1000 && timer.ms < 1500) {
+          this.name1.setText(bee1Name);
+        };
+        // the
+        if (timer.ms > 1500 && timer.ms < 2000) {
+          this.the1.setText('the');
+        };
+        // bee1 adjective
+        if (timer.ms > 2000 && timer.ms < 2500) {
+          this.adj1.setText(bee1Adj);
+        };
+        // vs
+        if (timer.ms > 2500 && timer.ms < 3000) {
+          this.versus.setText('vs');
+        };
+        // bee2 name
+        if (timer.ms > 3000 && timer.ms < 3500) {
+          this.name2.setText(bee2Name);
+        };
+        // the
+        if (timer.ms > 3500 && timer.ms < 4000) {
+          this.the2.setText('the');
+        };
+        // bee2 adjective
+        if (timer.ms > 4000 && timer.ms < 4500) {
+          this.adj2.setText(bee2Adj);
+        };
+        if (timer.ms > 5000 && timer.ms < 5500) {
+          this.fight.setText('BUZZ!');
+          this.flight.loopFull();
+        };
+      };
     },
 
 
@@ -241,6 +346,27 @@ gameState.prototype = {
       // console.log("after y:"+this.beeSprite1.body.velocity.y);
     },
 
+    setUp: function() {
+      timer = game.time.create();
+      timerEvent = timer.add(Phaser.Timer.SECOND * 6, this.endTimer, this);
+      // Start the timer
+      timer.start();
+    },
+
+    endTimer: function() {
+        // Stop the timer when the delayed event triggers
+        timer.stop();
+        game.physics.p2.resume();
+        this.name1.setText('');
+        this.the1.setText('');
+        this.adj1.setText('');
+        this.versus.setText('');
+        this.name2.setText('');
+        this.the2.setText('');
+        this.adj2.setText('');
+        this.fight.setText('');
+
+    },
 
     player2Stung: function(bee, stinger) {
       console.log('2stung')
