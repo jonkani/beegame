@@ -2,7 +2,7 @@ var Menu = {
 
     preload : function() {
         game.load.image('menuBee', './sprites/bee.png');
-        game.load.image('questionMark', './sprites/questionmark.png');
+        game.load.image('questionMark', './sprites/questionmarkB.png');
         game.load.audio('flight', 'sprites/flight.mp3');
     },
 

@@ -52,6 +52,7 @@ gameState.prototype = {
     },
 
     create: function () {
+      // setup physics and world bounds, pause movement
       game.world.setBounds(0, 0, 900, 600);
       this.game.scale.pageAlignHorizontally = true;
       this.game.scale.pageAlignVertically = true;
@@ -61,6 +62,7 @@ gameState.prototype = {
       game.physics.p2.restitution = 0.8;
       game.physics.p2.pause();
 
+      // add music
       this.flight = this.game.add.audio('flight');
 
       // create bee 1
@@ -83,15 +85,13 @@ gameState.prototype = {
       this.game.physics.p2.enable(this.stinger1);
       this.game.physics.p2.enable(this.stinger2);
 
+      // load stinger hitboxes
       this.stinger1.body.clearShapes();
       this.stinger1.body.loadPolygon("stinger_physics", 'Stinger1');
       this.stinger2.body.clearShapes();
       this.stinger2.body.loadPolygon("stinger_physics", 'Stinger2');
 
-      // this.stinger1.body.kinematic = true;
-      // this.stinger2.body.kinematic = true;
-
-
+      // add stinger positioning children to bees
       this.stingPositioner1 = game.add.sprite(0, 70);
       this.stingPositioner1.anchor.set(0.5, 0.5);
       this.stingPositioner1.pivot.set(0, 0);
@@ -102,7 +102,7 @@ gameState.prototype = {
       this.stingPositioner2.pivot.set(0, 0);
       this.beeSprite2.addChild(this.stingPositioner2);
 
-      // create versus message placement
+      // create opening text placement locations
       // bee1 name
       this.name1 = game.add.text(beeProperties.startX + 120, beeProperties.startY - 20, "", {
         font: "20px silkscreennormal",
@@ -159,6 +159,7 @@ gameState.prototype = {
       });
       this.adj2.anchor.setTo(0.5,0.5);
 
+      // fight
       this.fight = game.add.text(gameProperties.screenWidth/2, gameProperties.screenHeight/3, "", {
       font: "60px silkscreennormal",
       fill: "#000000",
@@ -251,6 +252,7 @@ gameState.prototype = {
 
     update: function () {
       this.checkPlayerInput();
+
       // keep stingers attached to bee bodies
       this.stinger1.body.reset(this.stingPositioner1.world.x, this.stingPositioner1.world.y);
       this.stinger1.body.rotation = this.beeSprite1.rotation;
@@ -289,7 +291,7 @@ gameState.prototype = {
         if (timer.ms > 4000 && timer.ms < 4500) {
           this.adj2.setText(bee2Adj);
         };
-        if (timer.ms > 5000 && timer.ms < 5500) {
+        if (timer.ms > 5000 && timer.ms < 5100) {
           this.fight.setText('BUZZ!');
           this.flight.loopFull();
         };
@@ -308,53 +310,73 @@ gameState.prototype = {
     },
 
     stingerRepulse: function(body1, body2) {
-      // var bee1X = this.beeSprite1.body.velocity.x;
-      // var bee1Y = this.beeSprite1.body.velocity.y;
-      // var bee2X = this.beeSprite2.body.velocity.x;
-      // var bee2Y = this.beeSprite2.body.velocity.y;
-      // console.log("before x:"+this.beeSprite1.body.velocity.x);
-      // console.log("before y:"+this.beeSprite1.body.velocity.y);
-      //
-      // if (Math.sign(this.beeSprite1.body.velocity.x) === 1) {
-      //   this.beeSprite1.body.velocity.x = -this.beeSprite1.body.velocity.x -200;
-      // }
-      // else if (Math.sign(this.beeSprite1.body.velocity.x) === -1) {
-      //   this.beeSprite1.body.velocity.x = -this.beeSprite1.body.velocity.x +200;
-      // }
-      //
-      // if (Math.sign(this.beeSprite1.body.velocity.y) === 1) {
-      //   this.beeSprite1.body.velocity.x = -this.beeSprite1.body.velocity.y -200;
-      // }
-      // else if (Math.sign(this.beeSprite1.body.velocity.y) === -1) {
-      //   this.beeSprite1.body.velocity.x = -this.beeSprite1.body.velocity.y +200;
-      // }
-      //
-      // if (Math.sign(this.beeSprite2.body.velocity.x) === 1) {
-      //   this.beeSprite2.body.velocity.x = -this.beeSprite2.body.velocity.x -200;
-      // }
-      // else if (Math.sign(this.beeSprite1.body.velocity.x) === -1) {
-      //   this.beeSprite2.body.velocity.x = -this.beeSprite2.body.velocity.x +200;
-      // }
-      //
-      // if (Math.sign(this.beeSprite1.body.velocity.y) === 1) {
-      //   this.beeSprite2.body.velocity.x = -this.beeSprite2.body.velocity.y -200;
-      // }
-      // else if (Math.sign(this.beeSprite1.body.velocity.y) === -1) {
-      //   this.beeSprite2.body.velocity.x = -this.beeSprite2.body.velocity.y +200;
-      // }
-      // console.log("after x:"+this.beeSprite1.body.velocity.x);
-      // console.log("after y:"+this.beeSprite1.body.velocity.y);
+      var exchange = 0;
+      var bee1X = this.beeSprite1.body.velocity.x + Math.sign(this.beeSprite1.body.velocity.x) * 100;
+      var bee1Y = this.beeSprite1.body.velocity.y + Math.sign(this.beeSprite1.body.velocity.y) * 100;
+      var bee2X = this.beeSprite2.body.velocity.x + Math.sign(this.beeSprite2.body.velocity.x) * 100;
+      var bee2Y = this.beeSprite2.body.velocity.y + Math.sign(this.beeSprite2.body.velocity.y) * 100;
+      // checks to see if sprites are moving in the same direction
+      if (Math.sign(bee1X) === Math.sign(bee2X) && Math.sign(bee1Y) === Math.sign(bee2Y)) {
+        // bee1 is faster than bee2
+        if (Math.abs(bee1X) > Math.abs(bee2X) && Math.abs(bee1Y) > Math.abs(bee2Y)) {
+          bee1X = -bee1X;
+          bee1Y = -bee2Y;
+          bee2X = this.beeSprite2.body.velocity.x + Math.sign(this.beeSprite2.body.velocity.x) * 50;
+          bee2Y = this.beeSprite2.body.velocity.y + Math.sign(this.beeSprite2.body.velocity.y) * 50;
+        }
+        // bee2 is faster than bee1
+        else if (Math.abs(bee1X) < Math.abs(bee2X) && Math.abs(bee1Y) < Math.abs(bee2Y)) {
+          bee1X = this.beeSprite1.body.velocity.x + Math.sign(this.beeSprite1.body.velocity.x) * 50;
+          bee1Y = this.beeSprite1.body.velocity.y + Math.sign(this.beeSprite1.body.velocity.y) * 50
+          bee2X = -bee2X;
+          bee2Y = -bee2Y;
+          }
+          else {
+            if (Math.round(Math.random())) {
+              bee1X = -bee1X;
+              bee1Y = -bee2Y;
+              bee2X = this.beeSprite2.body.velocity.x + Math.sign(this.beeSprite2.body.velocity.x) * 50;
+              bee2Y = this.beeSprite2.body.velocity.y + Math.sign(this.beeSprite2.body.velocity.y) * 50;
+            }
+            else {
+              bee1X = this.beeSprite1.body.velocity.x + Math.sign(this.beeSprite1.body.velocity.x) * 50;
+              bee1Y = this.beeSprite1.body.velocity.y + Math.sign(this.beeSprite1.body.velocity.y) * 50
+              bee2X = -bee2X;
+              bee2Y = -bee2Y;
+            };
+          }
+        this.beeSprite1.body.velocity.x = bee1X;
+        this.beeSprite1.body.velocity.y = bee1Y;
+        this.beeSprite2.body.velocity.x = bee2X;
+        this.beeSprite2.body.velocity.y = bee2Y;
+      }
+      // if they have opposite headings, reverses them
+      else {
+        if (Math.sign(bee1X) !== Math.sign(bee2X)) {
+          exchange = bee1X
+          bee1X = bee2X;
+          bee2X = exchange;
+        };
+        if (Math.sign(bee1Y) !== Math.sign(bee2Y)) {
+          exchange = bee1Y;
+          bee1Y = bee2Y;
+          bee2Y = exchange;
+        };
+        this.beeSprite1.body.velocity.x = bee1X;
+        this.beeSprite1.body.velocity.y = bee1Y;
+        this.beeSprite2.body.velocity.x = bee2X;
+        this.beeSprite2.body.velocity.y = bee2Y;
+      };
     },
 
     setUp: function() {
       timer = game.time.create();
       timerEvent = timer.add(Phaser.Timer.SECOND * 6, this.endTimer, this);
-      // Start the timer
       timer.start();
     },
 
     endTimer: function() {
-        // Stop the timer when the delayed event triggers
+        // stop the timer and remove opening text
         timer.stop();
         game.physics.p2.resume();
         this.name1.setText('');
@@ -365,7 +387,6 @@ gameState.prototype = {
         this.the2.setText('');
         this.adj2.setText('');
         this.fight.setText('');
-
     },
 
     player2Stung: function(bee, stinger) {
