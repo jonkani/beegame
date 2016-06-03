@@ -422,7 +422,7 @@ gameState.prototype = {
           game.physics.p2.pause();
           this.fight.setText('red bee is best bee');
           this.win.play();
-          this.flight.fadeOut(4000);
+          this.flight.fadeOut(4500);
           game.time.events.add(Phaser.Timer.SECOND * 5, this.gameReset, this);
         };
       };
@@ -441,7 +441,7 @@ gameState.prototype = {
           game.physics.p2.pause();
           this.fight.setText('blue bee is best bee');
           this.win.play();
-          this.flight.fadeOut(4000);
+          this.flight.fadeOut(4500);
           game.time.events.add(Phaser.Timer.SECOND * 5, this.gameReset, this);
         };
       }
