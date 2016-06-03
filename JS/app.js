@@ -15,6 +15,9 @@ var assets = {
   stinger1: {URL: 'Sprites/Stinger1.png', name: 'Stinger1'},
   stinger2: {URL: 'Sprites/Stinger2.png', name: 'Stinger2'},
 
+  heart1: {URL: 'Sprites/blueheart.png', name: 'heart1'},
+  heart2: {URL: 'Sprites/redheart.png', name: 'heart2'},
+
   stingBlank: {name: 'stingBlank'}
 }
 
@@ -32,6 +35,8 @@ var gameState = function(game){
   this.beeSpite2;
   this.stingerSprite1;
   this.stingerSprite2;
+  this.heartSprite1;
+  this.heartSprite2;
 
   this.key_left1;
   this.key_right1;
@@ -48,6 +53,8 @@ gameState.prototype = {
       game.load.image(assets.bee2.name, assets.bee2.URL);
       game.load.image(assets.stinger1.name, assets.stinger1.URL);
       game.load.image(assets.stinger2.name, assets.stinger2.URL);
+      game.load.image(assets.heart1.name, assets.heart1.URL);
+      game.load.image(assets.heart2.name, assets.heart2.URL);
       this.game.load.physics("stinger_physics", "Sprites/Stinger2.json");
     },
 
@@ -64,6 +71,11 @@ gameState.prototype = {
 
       // add music
       this.flight = this.game.add.audio('flight');
+
+      this.heartSprite1 = game.add.sprite(10, 45, assets.heart1.name);
+      this.heartSprite12 = game.add.sprite(10, 10, assets.heart1.name);
+      this.heartSprite2 = game.add.sprite(848, 10, assets.heart2.name);
+      this.heartSprite22 = game.add.sprite(848, 45, assets.heart2.name);
 
       // create bee 1
       this.beeSprite1 = game.add.sprite(beeProperties.startX, beeProperties.startY, assets.bee1.name);
@@ -231,17 +243,18 @@ gameState.prototype = {
       this.blockL.body.collides([this.bee1BodyGroup, this.bee2BodyGroup]);
       this.blockR.body.collides([this.bee1BodyGroup, this.bee2BodyGroup]);
       this.beeSprite1.body.collides([this.bee2BodyGroup, this.bee2StingerGroup, this.terrainGroup]);
-      this.beeSprite2.body.collides([this.bee1BodyGroup, this.bee2StingerGroup,  this.terrainGroup]);
+      this.beeSprite2.body.collides([this.bee1BodyGroup, this.bee1StingerGroup,  this.terrainGroup]);
 
       // assign stinger collisions
       this.stinger1.body.collides([this.bee2StingerGroup, this.bee2BodyGroup]);
-      this.stinger2.body.collides([this.bee1StingerGroup, this.bee2BodyGroup]);
+      this.stinger2.body.collides([this.bee1StingerGroup, this.bee1BodyGroup]);
 
-      // this.stinger1.body.collides(this.bee2StingerGroup, this.stingerRepulse, this);
-      // this.stinger2.body.collides(this.bee1StingerGroup, this.stingerRepulse, this);
 
       this.stinger1.body.createBodyCallback(this.stinger2, this.stingerRepulse, this);
       this.stinger2.body.createBodyCallback(this.stinger1, this.stingerRepulse, this);
+
+      this.stinger1.body.createBodyCallback(this.beeSprite2.body, this.bee2Stung, this);
+      this.stinger2.body.createBodyCallback(this.beeSprite1.body, this.bee1Stung, this);
 
 
       this.initKeyboard();
@@ -310,6 +323,7 @@ gameState.prototype = {
     },
 
     stingerRepulse: function(body1, body2) {
+      this.stingDelay();
       var exchange = 0;
       var bee1X = this.beeSprite1.body.velocity.x + Math.sign(this.beeSprite1.body.velocity.x) * 100;
       var bee1Y = this.beeSprite1.body.velocity.y + Math.sign(this.beeSprite1.body.velocity.y) * 100;
@@ -387,12 +401,55 @@ gameState.prototype = {
         this.the2.setText('');
         this.adj2.setText('');
         this.fight.setText('');
+        bee1Health = 2;
+        bee2Health = 2;
+        stung = false;
     },
 
-    player2Stung: function(bee, stinger) {
-      console.log('2stung')
+    bee1Stung: function() {
+      if (stung === false) {
+        bee1Health -= 1;
+        if (bee1Health > 0) {
+          this.stingerRepulse();
+          this.heartSprite1.kill();
+        }
+        else {
+          this.heartSprite12.kill();
+          game.physics.p2.pause();
+          this.fight.setText('red bee is best bee');
+          game.time.events.add(Phaser.Timer.SECOND * 5, this.gameReset, this);
+        };
+      };
     },
 
+    bee2Stung: function() {
+      if (stung === false) {
+        bee2Health -= 1;
+        if (bee2Health > 0) {
+          this.stingerRepulse();
+          this.heartSprite22.kill();
+        }
+        else {
+          this.heartSprite2.kill();
+          game.physics.p2.pause();
+          this.fight.setText('blue bee is best bee');
+          game.time.events.add(Phaser.Timer.SECOND * 5, this.gameReset, this);
+        };
+      }
+    },
+
+    stingDelay: function() {
+      stung = true;
+      game.time.events.add(Phaser.Timer.SECOND * 1, this.stingReset, this);
+    },
+
+    stingReset: function() {
+      stung = false;
+    },
+
+    gameReset: function() {
+      game.state.start(states.menu)
+    },
 
     checkPlayerInput: function() {
       if (this.key_left1.isDown) {
@@ -428,6 +485,9 @@ gameState.prototype = {
 };
 
 var game = new Phaser.Game(gameProperties.screenWidth, gameProperties.screenHeight, Phaser.AUTO, 'gameDiv');
+var bee1Health = 2;
+var bee2Health = 2;
+var stung = false;
 var bee1Name = "";
 var bee2Name = "";
 var bee1Adj = "";
