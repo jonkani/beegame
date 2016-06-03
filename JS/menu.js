@@ -1,9 +1,11 @@
 var Menu = {
 
     preload : function() {
-        game.load.image('menuBee', './sprites/bee.png');
-        game.load.image('questionMark', './sprites/questionmarkB.png');
-        game.load.audio('flight', 'sprites/flight.mp3');
+        game.load.image('menuBee', '../Sprites/Bee.png');
+        game.load.image('questionMark', '../Sprites/questionmarkB.png');
+        game.load.audio('flight', '../Sprites/flight.mp3');
+        game.load.audio('beep', '../Sprites/beep.mp3');
+        game.load.audio('win', '../Sprites/win.mp3');
     },
 
     create: function () {

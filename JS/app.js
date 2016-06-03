@@ -9,14 +9,14 @@ var states = {
 };
 
 var assets = {
-  bee1: {URL: 'Sprites/Bee1.png', name: 'bee1'},
-  bee2: {URL: 'Sprites/Bee22.png', name: 'bee2'},
+  bee1: {URL: '../Sprites/Bee1.png', name: 'bee1'},
+  bee2: {URL: '../Sprites/Bee22.png', name: 'bee2'},
 
-  stinger1: {URL: 'Sprites/Stinger1.png', name: 'Stinger1'},
-  stinger2: {URL: 'Sprites/Stinger2.png', name: 'Stinger2'},
+  stinger1: {URL: '../Sprites/Stinger1.png', name: 'Stinger1'},
+  stinger2: {URL: '../Sprites/Stinger2.png', name: 'Stinger2'},
 
-  heart1: {URL: 'Sprites/blueheart.png', name: 'heart1'},
-  heart2: {URL: 'Sprites/redheart.png', name: 'heart2'},
+  heart1: {URL: '../Sprites/blueheart.png', name: 'heart1'},
+  heart2: {URL: '../Sprites/redheart.png', name: 'heart2'},
 
   stingBlank: {name: 'stingBlank'}
 }
@@ -69,8 +69,10 @@ gameState.prototype = {
       game.physics.p2.restitution = 0.8;
       game.physics.p2.pause();
 
-      // add music
+      // add audio
       this.flight = this.game.add.audio('flight');
+      this.beep = this.game.add.audio('beep');
+      this.win = this.game.add.audio('win');
 
       this.heartSprite1 = game.add.sprite(10, 45, assets.heart1.name);
       this.heartSprite12 = game.add.sprite(10, 10, assets.heart1.name);
@@ -412,11 +414,13 @@ gameState.prototype = {
         if (bee1Health > 0) {
           this.stingerRepulse();
           this.heartSprite1.kill();
+          this.beep.play();
         }
         else {
           this.heartSprite12.kill();
           game.physics.p2.pause();
           this.fight.setText('red bee is best bee');
+          this.win.play();
           game.time.events.add(Phaser.Timer.SECOND * 5, this.gameReset, this);
         };
       };
@@ -428,11 +432,13 @@ gameState.prototype = {
         if (bee2Health > 0) {
           this.stingerRepulse();
           this.heartSprite22.kill();
+          this.beep.play();
         }
         else {
           this.heartSprite2.kill();
           game.physics.p2.pause();
           this.fight.setText('blue bee is best bee');
+          this.win.play();
           game.time.events.add(Phaser.Timer.SECOND * 5, this.gameReset, this);
         };
       }
