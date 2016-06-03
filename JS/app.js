@@ -252,10 +252,10 @@ gameState.prototype = {
       this.stinger1.body.collides([this.bee2StingerGroup, this.bee2BodyGroup]);
       this.stinger2.body.collides([this.bee1StingerGroup, this.bee1BodyGroup]);
 
-
+      // stinger to stinger
       this.stinger1.body.createBodyCallback(this.stinger2, this.stingerRepulse, this);
       this.stinger2.body.createBodyCallback(this.stinger1, this.stingerRepulse, this);
-
+      // stinger to body
       this.stinger1.body.createBodyCallback(this.beeSprite2.body, this.bee2Stung, this);
       this.stinger2.body.createBodyCallback(this.beeSprite1.body, this.bee1Stung, this);
 
@@ -278,6 +278,7 @@ gameState.prototype = {
     },
 
     render: function () {
+      // intro sequence
       if (timer.running) {
         // bee1 name
         if (timer.ms > 1000 && timer.ms < 1500) {
@@ -314,7 +315,6 @@ gameState.prototype = {
       };
     },
 
-
     initKeyboard: function() {
       this.key_left1 = game.input.keyboard.addKey(Phaser.Keyboard.A);
       this.key_right1 = game.input.keyboard.addKey(Phaser.Keyboard.D);
@@ -325,6 +325,7 @@ gameState.prototype = {
       this.key_forward2 = game.input.keyboard.addKey(Phaser.Keyboard.UP);
     },
 
+    // stinger contact collision control
     stingerRepulse: function(body1, body2) {
       this.stingDelay();
       var exchange = 0;
@@ -386,12 +387,13 @@ gameState.prototype = {
       };
     },
 
+    // starts timer for intro text control
     setUp: function() {
       timer = game.time.create();
       timerEvent = timer.add(Phaser.Timer.SECOND * 6, this.endTimer, this);
       timer.start();
     },
-
+    // ends timer, removes text, allows movement
     endTimer: function() {
         // stop the timer and remove opening text
         timer.stop();
@@ -409,6 +411,7 @@ gameState.prototype = {
         stung = false;
     },
 
+    // controls bee1's stung reactions
     bee1Stung: function() {
       if (stung === false) {
         bee1Health -= 1;
@@ -428,6 +431,7 @@ gameState.prototype = {
       };
     },
 
+    // controls bee2's stung reactions
     bee2Stung: function() {
       if (stung === false) {
         bee2Health -= 1;
@@ -447,20 +451,24 @@ gameState.prototype = {
       }
     },
 
+    // puts a 1 second delay between stings
     stingDelay: function() {
       stung = true;
       game.time.events.add(Phaser.Timer.SECOND * 1, this.stingReset, this);
     },
 
+    // reallows stinging
     stingReset: function() {
       stung = false;
     },
 
+    // reverts game to menu
     gameReset: function() {
       this.flight.stop();
       game.state.start(states.menu);
     },
 
+    // handles controls
     checkPlayerInput: function() {
       if (this.key_left1.isDown) {
         this.beeSprite1.body.rotateLeft(beeProperties.angularVelocity);
