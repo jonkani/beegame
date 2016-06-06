@@ -38,12 +38,12 @@ var gameState = function(game) {
   this.heartSprite1;
   this.heartSprite2;
 
-  this.key_left1;
-  this.key_right1;
-  this.key_forward1;
-  this.key_left2;
-  this.key_right2;
-  this.key_forward2;
+  this.keyLeft1;
+  this.keyRight1;
+  this.keyForward1;
+  this.keyLeft2;
+  this.keyRight2;
+  this.keyForward2;
 };
 
 gameState.prototype = {
@@ -322,17 +322,17 @@ gameState.prototype = {
   },
 
   initKeyboard: function() {
-    this.key_left1 = game.input.keyboard.addKey(Phaser.Keyboard.A);
-    this.key_right1 = game.input.keyboard.addKey(Phaser.Keyboard.D);
-    this.key_forward1 = game.input.keyboard.addKey(Phaser.Keyboard.W);
+    this.keyLeft1 = game.input.keyboard.addKey(Phaser.Keyboard.A);
+    this.keyRight1 = game.input.keyboard.addKey(Phaser.Keyboard.D);
+    this.keyForward1 = game.input.keyboard.addKey(Phaser.Keyboard.W);
 
-    this.key_left2 = game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
-    this.key_right2 = game.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
-    this.key_forward2 = game.input.keyboard.addKey(Phaser.Keyboard.UP);
+    this.keyLeft2 = game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
+    this.keyRight2 = game.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
+    this.keyForward2 = game.input.keyboard.addKey(Phaser.Keyboard.UP);
   },
 
   // stinger contact collision control
-  stingerRepulse: function(body1, body2) {
+  stingerRepulse: function() {
     this.stingDelay();
     var exchange = 0;
     var bee1X = this.beeSprite1.body.velocity.x + Math.sign(this.beeSprite1.body.velocity.x) * 100;
@@ -480,31 +480,31 @@ gameState.prototype = {
 
   // handles controls
   checkPlayerInput: function() {
-    if (this.key_left1.isDown) {
+    if (this.keyLeft1.isDown) {
       this.beeSprite1.body.rotateLeft(beeProperties.angularVelocity);
     }
-    else if (this.key_right1.isDown) {
+    else if (this.keyRight1.isDown) {
       this.beeSprite1.body.rotateRight(beeProperties.angularVelocity);
     }
     else {
       this.beeSprite1.body.setZeroRotation();
     }
 
-    if (this.key_forward1.isDown) {
+    if (this.keyForward1.isDown) {
       this.beeSprite1.body.thrust(beeProperties.acceleration);
     }
 
-    if (this.key_left2.isDown) {
+    if (this.keyLeft2.isDown) {
       this.beeSprite2.body.rotateLeft(beeProperties.angularVelocity);
     }
-    else if (this.key_right2.isDown) {
+    else if (this.keyRight2.isDown) {
       this.beeSprite2.body.rotateRight(beeProperties.angularVelocity);
     }
     else {
       this.beeSprite2.body.setZeroRotation();
     }
 
-    if (this.key_forward2.isDown) {
+    if (this.keyForward2.isDown) {
       this.beeSprite2.body.thrust(beeProperties.acceleration);
     }
   }
