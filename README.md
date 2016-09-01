@@ -1,5 +1,8 @@
 # Bee Game: The Game About Bees
 
+<img src="https://github.com/jcquery/beegame/raw/master/screenshots/startdemo.gif" height="250">
+<img src="https://github.com/jcquery/beegame/raw/master/screenshots/dueldemo.gif" height="250">
+
 This is a game about bees that addresses the the problem of not having a short, multiplayer, bee-related game to play when you are really craving both bees and multiplayer. Playing at least 20 minutes of games about bees a week is clinically linked to higher rates of having played games about bees, which is of clear and obvious import.
 
 Bee Game uses the Wordnik API to dynamically generate names and titles for the bees prior to said bees fighting to the death, which allows players to better connect with their bee avatar and feel a modicum of guilt when their ineptitude leads to said bee's grisly death.
